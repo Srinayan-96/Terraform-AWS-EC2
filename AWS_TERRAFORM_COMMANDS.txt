@@ -1,0 +1,305 @@
+TERRAFORM AWS EC2 — COMMANDS & SETUP GUIDE
+==============================================
+
+1. PROJECT FILES
+----------------
+
+terraform-aws-ec2/
+├── main.tf
+├── variables.tf
+├── outputs.tf
+├── README.md
+├── AWS_TERRAFORM_COMMANDS.txt
+└── .gitignore
+
+
+2. INSTALLATION CHECK
+---------------------
+
+Check AWS CLI:
+
+aws --version
+
+Check Terraform:
+
+terraform --version
+
+Check Git:
+
+git --version
+
+
+3. AWS IAM SETUP
+----------------
+
+Use an IAM identity for CLI/API access rather than using the AWS root
+account for normal development.
+
+General steps in AWS Console:
+
+1. Sign in to AWS.
+2. Open IAM.
+3. Create/select an IAM user or other suitable IAM identity.
+4. Give it the permissions required by the Terraform project.
+5. For access-key based local CLI authentication, create an access key.
+6. Copy the access key ID and secret access key securely.
+
+IMPORTANT:
+- Never put access keys in .tf files.
+- Never commit credentials to GitHub.
+- Never paste secret keys into README files.
+- Never upload screenshots containing secret credentials.
+- If credentials are exposed, revoke/rotate them immediately.
+
+For production, follow least-privilege access instead of giving broad
+permissions unnecessarily.
+
+
+4. CONFIGURE AWS CLI
+--------------------
+
+Run:
+
+aws configure
+
+Enter:
+
+AWS Access Key ID:     <YOUR_ACCESS_KEY_ID>
+AWS Secret Access Key: <YOUR_SECRET_ACCESS_KEY>
+Default region name:   ap-south-1
+Default output format: json
+
+The credentials are stored by AWS CLI according to its normal local
+configuration mechanism.
+
+
+5. VERIFY AWS CLI LOGIN
+-----------------------
+
+Run:
+
+aws sts get-caller-identity
+
+If authentication is working, AWS returns identity/account information.
+
+Optional region check:
+
+aws configure get region
+
+
+6. TERRAFORM INITIALIZATION
+---------------------------
+
+Open the terminal inside the project directory.
+
+Run:
+
+terraform init
+
+This initializes the Terraform working directory and downloads the
+required AWS provider.
+
+
+7. FORMAT TERRAFORM FILES
+-------------------------
+
+terraform fmt
+
+
+8. VALIDATE TERRAFORM
+---------------------
+
+terraform validate
+
+Expected:
+
+Success! The configuration is valid.
+
+
+9. REVIEW THE PLAN
+------------------
+
+terraform plan
+
+Review the resources Terraform intends to create before applying.
+
+
+10. CREATE EC2 INSTANCES
+------------------------
+
+terraform apply
+
+When Terraform asks for confirmation:
+
+yes
+
+
+11. VIEW OUTPUTS
+----------------
+
+Show all outputs:
+
+terraform output
+
+Show instance IDs:
+
+terraform output instance_ids
+
+Show public IPs:
+
+terraform output public_ips
+
+
+12. CHECK AWS EC2 USING AWS CLI
+------------------------------
+
+aws ec2 describe-instances
+
+
+13. CHECK TERRAFORM STATE
+-------------------------
+
+terraform state list
+
+Do NOT upload terraform.tfstate to GitHub.
+
+
+14. DESTROY RESOURCES
+---------------------
+
+When the practical is finished:
+
+terraform destroy
+
+Confirm:
+
+yes
+
+This removes resources managed by this Terraform configuration.
+
+
+15. GIT INITIALIZATION
+----------------------
+
+git init
+
+git status
+
+git add .
+
+git commit -m "Add Terraform AWS EC2 deployment"
+
+
+16. CONNECT TO GITHUB
+---------------------
+
+Create an empty repository on GitHub.
+
+Then:
+
+git remote add origin https://github.com/<YOUR-USERNAME>/<YOUR-REPOSITORY>.git
+
+Check remote:
+
+git remote -v
+
+Rename branch:
+
+git branch -M main
+
+Push:
+
+git push -u origin main
+
+
+17. IMPORTANT GITHUB SECURITY CHECK
+-----------------------------------
+
+Before:
+
+git add .
+
+check:
+
+git status
+
+DO NOT COMMIT:
+
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
+*.tfvars
+.env
+AWS access keys
+AWS secret keys
+.pem private keys
+SSH private keys
+
+
+18. IF AN AWS CREDENTIAL IS EXPOSED
+-----------------------------------
+
+Immediately:
+
+1. Revoke/delete the exposed credential.
+2. Create a replacement credential if still required.
+3. Remove the secret from the repository/history as appropriate.
+4. Check AWS CloudTrail/billing for unexpected activity.
+5. Never reuse an exposed secret.
+
+
+19. COMPLETE BASIC WORKFLOW
+---------------------------
+
+aws configure
+
+aws sts get-caller-identity
+
+terraform init
+
+terraform fmt
+
+terraform validate
+
+terraform plan
+
+terraform apply
+
+terraform output
+
+aws ec2 describe-instances
+
+terraform destroy
+
+
+20. PROJECT DEFAULTS
+--------------------
+
+AWS Region:
+
+us-east-1
+
+EC2 Instance Type:
+
+t3.micro
+
+Default Instance Count:
+
+2
+
+AMI:
+
+ami-0f58b397bc5c1f2e8
+
+Instance Names:
+
+Terraform-EC2-1
+Terraform-EC2-2
+
+
+NOTE ABOUT AMI
+---------------
+
+AMI IDs are region-specific. If you change the AWS region, verify that
+the AMI ID exists and is compatible in that region before running
+terraform apply.
